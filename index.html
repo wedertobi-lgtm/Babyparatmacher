@@ -273,7 +273,7 @@
   <!-- COACH -->
   <div id="view-coach" class="view">
     <div class="card" style="margin-top:6px">
-      <div class="card-label">&#x1F4AC; Dein Coach</div>
+      <div class="card-label">💬 Dein Coach</div>
       <div style="font-size:13px;color:var(--muted);font-family:var(--font-body)">Schreib was dich beschäftigt – Heisshunger, Muedigkeit, keine Motivation. Ich antworte sofort.</div>
     </div>
     <div class="quick-btns">
@@ -285,11 +285,11 @@
     </div>
     <div class="card" style="padding:16px">
       <div class="coach-messages" id="coach-messages">
-        <div class="msg msg-coach">Hallo! Was beschäftigt dich gerade? &#x1F44B;</div>
+        <div class="msg msg-coach">Hallo! Was beschäftigt dich gerade? 👋</div>
       </div>
       <div class="coach-input-row">
         <textarea class="coach-input" id="coach-input" rows="1" placeholder="Schreib mir..." onkeydown="coachKeydown(event)"></textarea>
-        <button class="coach-send" id="coach-send" onclick="sendCoach()">&#x27A4;</button>
+        <button class="coach-send" id="coach-send" onclick="sendCoach()">➤</button>
       </div>
     </div>
   </div>
@@ -468,7 +468,7 @@ async function sendCoach(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
-        max_tokens:300,
+        max_tokens:150,
         system:context,
         messages:[{role:'user',content:msg}]
       })
@@ -479,7 +479,7 @@ async function sendCoach(){
     addMsg(reply,'coach');
   } catch(e) {
     document.getElementById('typing')?.remove();
-    addMsg('Kurz nicht erreichbar – aber du schaffst das! &#x1F4AA;','coach');
+    addMsg('Kurz nicht erreichbar – aber du schaffst das! 💪','coach');
   }
   btn.disabled=false;
 }

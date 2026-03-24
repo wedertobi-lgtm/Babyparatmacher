@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#faf5ef">
+<title>Fit for Baby 2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf5ef;
+    --bg2: #f3ece3;
+    --surface: #ffffff;
+    --border: #e8ddd2;
+    --text: #2e2118;
+    --muted: #a8917e;
+    --accent: #d4783a;
+    --accent-light: #fdeede;
+    --green: #4a9e72;
+    --green-light: #e4f5ec;
+    --red: #c75050;
+    --red-light: #fdeaea;
+    --baby: #5b9ec9;
+    --baby-light: #e6f2fb;
+    --font: 'Nunito', sans-serif;
+    --font-body: 'Nunito Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); overscroll-behavior: none; }
+  body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
+
+  .header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 22px 20px 16px; position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header-icon { width: 46px; height: 46px; border-radius: 14px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .header-label { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 1px; }
+  .header-title { font-size: 18px; font-weight: 800; color: var(--text); }
+  .ssw-pill { background: var(--baby-light); border-radius: 12px; padding: 8px 14px; text-align: center; }
+  .ssw-label { font-size: 10px; color: var(--baby); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .ssw-value { font-size: 22px; font-weight: 800; color: var(--baby); line-height: 1.1; }
+
+  .nav { display: flex; gap: 8px; padding: 12px 16px 4px; background: var(--bg); position: sticky; top: 79px; z-index: 99; }
+  .nav-btn { flex: 1; padding: 10px 4px; background: var(--surface); color: var(--muted); border: 1.5px solid var(--border); border-radius: 12px; font-family: var(--font); font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .nav-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 4px 12px rgba(212,120,58,0.25); }
+
+  .content { flex: 1; padding: 10px 16px 80px; overflow-y: auto; }
+  .view { display: none; }
+  .view.active { display: block; animation: fadeUp 0.22s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 18px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .card-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+
+  .baby-card { background: var(--baby-light); border-color: #c5dff0; }
+  .baby-inner { display: flex; align-items: center; gap: 16px; }
+  .baby-emoji { font-size: 58px; line-height: 1; background: white; border-radius: 16px; padding: 10px; flex-shrink: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+  .baby-size { font-size: 24px; font-weight: 800; color: var(--baby); }
+  .baby-info { font-size: 13px; color: #5a8aaa; margin-top: 4px; font-family: var(--font-body); }
+  .baby-ssw { font-size: 11px; color: #88afc8; margin-top: 6px; font-weight: 600; }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .stat-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .stat-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .stat-value { font-size: 32px; font-weight: 800; line-height: 1; }
+  .stat-unit { font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .progress-pct { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .progress-bar-bg { background: var(--bg2); border-radius: 10px; height: 14px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--accent), #e8a060); transition: width 0.7s cubic-bezier(.4,0,.2,1); }
+  .progress-meta { display: flex; justify-content: space-between; margin-top: 8px; }
+  .progress-meta span { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+  .chart-svg { width: 100%; height: 150px; display: block; border-radius: 10px; overflow: hidden; }
+  .chart-legend { display: flex; gap: 16px; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); font-weight: 600; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .weekly-inner { display: flex; align-items: center; gap: 14px; }
+  .weekly-badge { width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .weekly-ok { background: var(--green-light); border-color: #b5dfc8; }
+  .weekly-warn { background: var(--red-light); border-color: #f0c0c0; }
+  .weekly-ok .weekly-badge { background: var(--green-light); }
+  .weekly-warn .weekly-badge { background: var(--red-light); }
+  .weekly-sub { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .weekly-ok .weekly-sub { color: var(--green); }
+  .weekly-warn .weekly-sub { color: var(--red); }
+  .weekly-text { font-size: 14px; font-weight: 600; color: var(--text); }
+
+  .input-label { font-size: 12px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 8px; letter-spacing: 0.5px; }
+  .weight-input { width: 100%; background: var(--bg2); border: 2px solid var(--border); border-radius: 14px; padding: 14px 18px; color: var(--text); font-size: 28px; font-family: var(--font); font-weight: 800; outline: none; transition: border-color 0.2s; }
+  .weight-input:focus { border-color: var(--accent); background: white; }
+  .btn-primary { width: 100%; padding: 15px; margin-top: 12px; background: var(--accent); color: white; border: none; border-radius: 14px; font-size: 15px; font-weight: 800; cursor: pointer; font-family: var(--font); box-shadow: 0 4px 14px rgba(212,120,58,0.3); transition: all 0.25s; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary.saved { background: var(--green); box-shadow: 0 4px 14px rgba(74,158,114,0.3); }
+
+  .history-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--border); }
+  .history-row:last-child { border-bottom: none; }
+  .history-date { font-size: 14px; font-weight: 700; }
+  .history-week { font-size: 11px; color: var(--muted); margin-top: 2px; font-weight: 600; }
+  .history-weight { font-size: 20px; font-weight: 800; text-align: right; }
+  .history-diff { font-size: 12px; font-weight: 700; text-align: right; margin-top: 2px; }
+  .empty-state { color: var(--muted); font-size: 13px; text-align: center; padding: 28px 0; font-weight: 600; }
+
+  .rules-count-big { font-size: 42px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .rules-count-sub { font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 4px; }
+  .rule-item { background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 16px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+  .rule-item.checked { background: var(--green-light); border-color: #b5dfc8; }
+  .rule-item:active { transform: scale(0.98); }
+  .rule-check { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; transition: all 0.2s; border: 2px solid var(--border); color: transparent; }
+  .rule-item.checked .rule-check { background: var(--green); color: white; border-color: var(--green); }
+  .rule-emoji-wrap { width: 42px; height: 42px; border-radius: 12px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .rule-item.checked .rule-emoji-wrap { background: white; }
+  .rule-title { font-size: 15px; font-weight: 800; margin-bottom: 3px; }
+  .rule-desc { font-size: 12px; color: var(--muted); font-family: var(--font-body); line-height: 1.5; }
+  .tip-card { background: var(--accent-light); border-color: #f0ccaa; }
+  .tip-text { font-size: 14px; color: #8a5020; line-height: 1.7; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">👶</div>
+    <div>
+      <div class="header-label">Projekt</div>
+      <div class="header-title">Fit for Baby 2.0</div>
+    </div>
+  </div>
+  <div class="ssw-pill">
+    <div class="ssw-label">SSW</div>
+    <div class="ssw-value" id="ssw-display">–</div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="showView('dashboard',this)">📊 Dashboard</button>
+  <button class="nav-btn" onclick="showView('checkin',this)">⚖️ Check-in</button>
+  <button class="nav-btn" onclick="showView('regeln',this)">✅ Regeln</button>
+</div>
+
+<div class="content">
+
+  <div id="view-dashboard" class="view active">
+    <div class="card baby-card" style="margin-top:6px">
+      <div class="card-label" style="color:#7aadcc">Baby diese Woche</div>
+      <div class="baby-inner">
+        <div class="baby-emoji" id="baby-emoji">🌱</div>
+        <div>
+          <div class="baby-size" id="baby-size">–</div>
+          <div class="baby-info" id="baby-info">–</div>
+          <div class="baby-ssw" id="baby-ssw-text">–</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Aktuell</div>
+        <div class="stat-value" id="stat-current">115</div>
+        <div class="stat-unit">kg</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Verloren</div>
+        <div class="stat-value" id="stat-lost" style="color:var(--muted)">0</div>
+        <div class="stat-unit">kg</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="progress-header">
+        <div class="card-label" style="margin:0">Ziel: 87 kg</div>
+        <div class="progress-pct" id="progress-pct">0%</div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-meta">
+        <span>115 kg Start</span>
+        <span id="progress-remaining">Noch 28.0 kg</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Verlauf</div>
+      <svg class="chart-svg" id="chart-svg" viewBox="0 0 100 55" preserveAspectRatio="none"></svg>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent);opacity:0.6"></div>Ziel-Kurve</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Tatsächlich</div>
+      </div>
+    </div>
+
+    <div class="card" id="weekly-card">
+      <div class="weekly-inner">
+        <div class="weekly-badge"><span id="weekly-icon">⚡</span></div>
+        <div>
+          <div class="weekly-sub" id="weekly-sub">Wochen-Ziel</div>
+          <div class="weekly-text">Diese Woche: <strong id="weekly-target">–</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-checkin" class="view">
+    <div class="card" style="margin-top:6px">
+      <div class="card-label">Montags Check-in</div>
+      <label class="input-label">Aktuelles Gewicht (kg)</label>
+      <input type="number" step="0.1" min="50" max="200" id="weight-input" class="weight-input" placeholder="z.B. 113.5">
+      <button class="btn-primary" id="save-btn" onclick="saveEntry()">Eintragen ✓</button>
+    </div>
+    <div class="card">
+      <div class="card-label">Verlauf</div>
+      <div id="history-list"><div class="empty-state">Noch keine Einträge 📋</div></div>
+    </div>
+  </div>
+
+  <div id="view-regeln" class="view">
+    <div class="card" style="margin-top:6px">
+      <div class="card-label">Heute eingehalten</div>
+      <div class="rules-count-big"><span id="rules-count">0</span> / 3</div>
+      <div class="rules-count-sub" id="rules-message">Fang an – tippe eine Regel an!</div>
+    </div>
+
+    <div class="rule-item" id="rule-1" onclick="toggleRule(1)">
+      <div class="rule-check" id="check-1">✓</div>
+      <div class="rule-emoji-wrap">🧈</div>
+      <div><div class="rule-title">Fett halbieren</div><div class="rule-desc">Halbe Menge Fett,<br>Saucenrahm statt Vollrahm</div></div>
+    </div>
+    <div class="rule-item" id="rule-2" onclick="toggleRule(2)">
+      <div class="rule-check" id="check-2">✓</div>
+      <div class="rule-emoji-wrap">🍱</div>
+      <div><div class="rule-title">Portionen strukturieren</div><div class="rule-desc">Nach dem Kochen direkt abfüllen,<br>Topf vom Tisch weg</div></div>
+    </div>
+    <div class="rule-item" id="rule-3" onclick="toggleRule(3)">
+      <div class="rule-check" id="check-3">✓</div>
+      <div class="rule-emoji-wrap">🥦</div>
+      <div><div class="rule-title">Volumen erhöhen</div><div class="rule-desc">Mehr Gemüse = gleiche Menge,<br>weniger Kalorien</div></div>
+    </div>
+
+    <div class="card tip-card">
+      <div class="card-label" style="color:#c07840">💡 Dein Prinzip</div>
+      <div class="tip-text">Kein Verzicht. Kein Zählen.<br>Nur diese 3 Regeln – jeden Tag.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const START_WEIGHT=115,TARGET_WEIGHT=87,TOTAL_WEEKS=39;
+const START_DATE=new Date('2026-03-24');
+const PREGNANCY_WEEK_START=4;
+const BABY=[
+  {w:1,s:'Mohnkorn',e:'🌱',i:'Befruchtung'},
+  {w:4,s:'Reiskorn',e:'🌾',i:'Einnistung abgeschlossen'},
+  {w:6,s:'Linse',e:'🫘',i:'Herzschlag beginnt'},
+  {w:8,s:'Himbeere',e:'🫐',i:'Alle Organe angelegt'},
+  {w:10,s:'Erdbeere',e:'🍓',i:'Finger & Zehen sichtbar'},
+  {w:12,s:'Pflaume',e:'🍑',i:'1. Trimester abgeschlossen'},
+  {w:16,s:'Avocado',e:'🥑',i:'Bewegungen spürbar'},
+  {w:20,s:'Banane',e:'🍌',i:'Halbzeit!'},
+  {w:24,s:'Maiskolben',e:'🌽',i:'Lebensfähig ausserhalb'},
+  {w:28,s:'Aubergine',e:'🍆',i:'3. Trimester beginnt'},
+  {w:32,s:'Ananas',e:'🍍',i:'Augen öffnen sich'},
+  {w:36,s:'Melone',e:'🍈',i:'Fast bereit!'},
+  {w:40,s:'Kürbis',e:'🎃',i:'Geburtstermin 🎉'},
+];
+const MSGS=['Fang an – tippe eine Regel an!','Gut! Weiter so 💪','Fast geschafft!','Perfekter Tag! 🌟'];
+
+function getWeeks(){return Math.floor((Date.now()-START_DATE)/(7*24*60*60*1000));}
+function getPW(){return PREGNANCY_WEEK_START+getWeeks();}
+function getBaby(pw){let c=BABY[0];for(const m of BABY){if(pw>=m.w)c=m;}return c;}
+function loadE(){try{return JSON.parse(localStorage.getItem('ffb_entries')||'[]');}catch{return[];}}
+function saveE(e){localStorage.setItem('ffb_entries',JSON.stringify(e));}
+function loadR(){try{return JSON.parse(localStorage.getItem('ffb_rules')||'{}');}catch{return {};}}
+function saveR(r){localStorage.setItem('ffb_rules',JSON.stringify(r));}
+function tkey(){return new Date().toDateString();}
+
+function render(){
+  const entries=loadE(),weeks=getWeeks(),pw=getPW(),baby=getBaby(pw);
+  const latest=entries.length?entries[entries.length-1].weight:START_WEIGHT;
+  const lost=parseFloat((START_WEIGHT-latest).toFixed(1));
+  const targetNow=Math.max(TARGET_WEIGHT,START_WEIGHT-weeks);
+  const pct=Math.min(100,Math.max(0,(lost/(START_WEIGHT-TARGET_WEIGHT))*100));
+
+  document.getElementById('ssw-display').textContent=pw;
+  document.getElementById('baby-emoji').textContent=baby.e;
+  document.getElementById('baby-size').textContent=baby.s;
+  document.getElementById('baby-info').textContent=baby.i;
+  document.getElementById('baby-ssw-text').textContent=`Schwangerschaftswoche ${pw}`;
+  document.getElementById('stat-current').textContent=latest;
+  const le=document.getElementById('stat-lost');
+  le.textContent=lost>0?`-${lost}`:'0';
+  le.style.color=lost>0?'var(--green)':'var(--muted)';
+  document.getElementById('progress-pct').textContent=pct.toFixed(0)+'%';
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-remaining').textContent=`Noch ${Math.max(0,latest-TARGET_WEIGHT).toFixed(1)} kg`;
+
+  const ok=latest<=targetNow;
+  const wc=document.getElementById('weekly-card');
+  wc.className='card '+(ok?'weekly-ok':'weekly-warn');
+  document.getElementById('weekly-icon').textContent=ok?'✅':'⚡';
+  const ws=document.getElementById('weekly-sub');
+  ws.textContent=ok?'IM PLAN ✓':'WOCHEN-ZIEL';
+  document.getElementById('weekly-target').textContent=targetNow+' kg';
+
+  renderChart(entries,weeks);
+  renderHistory(entries);
+  renderRules();
+}
+
+function renderChart(entries,currentWeek){
+  const svg=document.getElementById('chart-svg');
+  const cMax=START_WEIGHT+2,cMin=TARGET_WEIGHT-2,range=cMax-cMin;
+  const toX=w=>(w/TOTAL_WEEKS)*100;
+  const toY=w=>((cMax-w)/range)*55;
+  const pts=[{week:0,weight:START_WEIGHT},...entries.map(e=>({week:e.week,weight:e.weight}))];
+
+  let h=`<rect width="100" height="55" fill="#fdf8f3" rx="0"/>`;
+  for(const x of[25,50,75])h+=`<line x1="${x}" y1="0" x2="${x}" y2="55" stroke="#ede4d8" stroke-width="0.4"/>`;
+  for(const w of[START_WEIGHT,105,100,95,TARGET_WEIGHT]){
+    const y=toY(w);
+    if(y>=0&&y<=55)h+=`<line x1="0" y1="${y}" x2="100" y2="${y}" stroke="#ede4d8" stroke-width="0.4"/>`;
+  }
+  h+=`<polygon points="0,${toY(START_WEIGHT)} 100,${toY(TARGET_WEIGHT)} 100,55 0,55" fill="rgba(212,120,58,0.06)"/>`;
+  h+=`<line x1="0" y1="${toY(START_WEIGHT)}" x2="100" y2="${toY(TARGET_WEIGHT)}" stroke="#d4783a" stroke-width="0.8" stroke-dasharray="2,2" opacity="0.5"/>`;
+  h+=`<line x1="${toX(currentWeek)}" y1="0" x2="${toX(currentWeek)}" y2="55" stroke="#d4783a" stroke-width="0.5" opacity="0.25"/>`;
+
+  if(pts.length>1){
+    const pd=pts.map((p,i)=>`${i===0?'M':'L'}${toX(p.week)},${toY(p.weight)}`).join(' ');
+    const ad=pd+` L${toX(pts[pts.length-1].week)},55 L0,55 Z`;
+    h+=`<path d="${ad}" fill="rgba(74,158,114,0.12)"/>`;
+    h+=`<path d="${pd}" fill="none" stroke="#4a9e72" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  }
+  pts.forEach((p,i)=>{
+    const c=i===0?'#c8b8a8':'#4a9e72';
+    h+=`<circle cx="${toX(p.week)}" cy="${toY(p.weight)}" r="2" fill="white" stroke="${c}" stroke-width="1.2"/>`;
+  });
+  svg.innerHTML=h;
+}
+
+function renderHistory(entries){
+  const el=document.getElementById('history-list');
+  if(!entries.length){el.innerHTML='<div class="empty-state">Noch keine Einträge 📋</div>';return;}
+  const rev=[...entries].reverse();
+  el.innerHTML=rev.map((e,i)=>{
+    const prev=rev[i+1];
+    const diff=prev?(e.weight-prev.weight):(e.weight-START_WEIGHT);
+    const ds=diff<0?diff.toFixed(1):(diff>0?'+'+diff.toFixed(1):'0.0');
+    const dc=diff<0?'var(--green)':diff>0?'var(--red)':'var(--muted)';
+    const d=new Date(e.date);
+    const dateStr=d.toLocaleDateString('de-CH',{day:'2-digit',month:'short'});
+    return `<div class="history-row"><div><div class="history-date">${dateStr}</div><div class="history-week">Woche ${e.week}</div></div><div><div class="history-weight">${e.weight} kg</div><div class="history-diff" style="color:${dc}">${ds} kg</div></div></div>`;
+  }).join('');
+}
+
+function renderRules(){
+  const rules=loadR(),key=tkey();
+  let count=0;
+  for(let i=1;i<=3;i++){
+    const checked=!!rules[`${key}_${i}`];
+    if(checked)count++;
+    document.getElementById(`rule-${i}`).className='rule-item'+(checked?' checked':'');
+  }
+  document.getElementById('rules-count').textContent=count;
+  document.getElementById('rules-message').textContent=MSGS[count];
+}
+
+function toggleRule(id){
+  const rules=loadR(),k=`${tkey()}_${id}`;
+  rules[k]=!rules[k];saveR(rules);renderRules();
+}
+
+function saveEntry(){
+  const val=parseFloat(document.getElementById('weight-input').value);
+  if(!val||val<50||val>200)return;
+  const entries=loadE();
+  entries.push({date:new Date().toISOString(),weight:val,week:getWeeks()});
+  saveE(entries);
+  document.getElementById('weight-input').value='';
+  const btn=document.getElementById('save-btn');
+  btn.textContent='✓ Gespeichert!';btn.classList.add('saved');
+  setTimeout(()=>{btn.textContent='Eintragen ✓';btn.classList.remove('saved');},2000);
+  render();
+}
+
+function showView(name,btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+render();
+</script>
+</body>
+</html>

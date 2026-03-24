@@ -140,6 +140,10 @@
   .quick-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
   .quick-btn { background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px; padding: 8px 14px; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; font-family: var(--font); transition: all 0.2s; }
   .quick-btn:active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+  .coach-link-btn { width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:16px; padding:16px 18px; display:flex; align-items:center; gap:14px; cursor:pointer; font-family:var(--font); text-align:left; box-shadow:0 2px 6px rgba(0,0,0,0.04); transition:all 0.2s; color:var(--text); }
+  .coach-link-btn:active { background:var(--accent-light); border-color:var(--accent); transform:scale(0.98); }
+  .coach-link-btn { display:flex; align-items:center; gap:12px; background:var(--surface); border:1.5px solid var(--border); border-radius:16px; padding:16px 20px; font-size:15px; font-weight:700; color:var(--text); text-decoration:none; font-family:var(--font); box-shadow:0 2px 6px rgba(0,0,0,0.04); transition:all 0.2s; }
+  .coach-link-btn:active { background:var(--accent-light); border-color:var(--accent); transform:scale(0.98); }
 </style>
 </head>
 <body>
@@ -273,24 +277,38 @@
   <!-- COACH -->
   <div id="view-coach" class="view">
     <div class="card" style="margin-top:6px">
-      <div class="card-label">💬 Dein Coach</div>
-      <div style="font-size:13px;color:var(--muted);font-family:var(--font-body)">Schreib was dich beschäftigt – Heisshunger, Muedigkeit, keine Motivation. Ich antworte sofort.</div>
-    </div>
-    <div class="quick-btns">
-      <button class="quick-btn" onclick="quickMsg('Ich habe Heisshunger')">Heisshunger</button>
-      <button class="quick-btn" onclick="quickMsg('Ich bin so müde heute')">Müde</button>
-      <button class="quick-btn" onclick="quickMsg('Ich hatte einen Rückfall')">Rückfall</button>
-      <button class="quick-btn" onclick="quickMsg('Ich brauche Motivation')">Motivation</button>
-      <button class="quick-btn" onclick="quickMsg('Was kann ich jetzt schnell essen?')">Snack-Idee</button>
-    </div>
-    <div class="card" style="padding:16px">
-      <div class="coach-messages" id="coach-messages">
-        <div class="msg msg-coach">Hallo! Was beschäftigt dich gerade? 👋</div>
+      <div class="card-label">&#x1F4AC; Dein Coach</div>
+      <div style="font-size:14px;color:var(--text);line-height:1.6;font-family:var(--font-body)">
+        Tippe auf ein Thema – Claude öffnet sich direkt mit deinem persönlichen Kontext.
       </div>
-      <div class="coach-input-row">
-        <textarea class="coach-input" id="coach-input" rows="1" placeholder="Schreib mir..." onkeydown="coachKeydown(event)"></textarea>
-        <button class="coach-send" id="coach-send" onclick="sendCoach()">➤</button>
-      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="coach-link-btn" onclick="openCoach('Ich habe gerade Heisshunger und weiss nicht was ich essen soll. Ich bin Tobias, wiege ca. 115kg, möchte abnehmen und koche selbst. Was kann ich jetzt essen?')">
+        <span style="font-size:24px">😩</span>
+        <div><div style="font-weight:800;font-size:15px">Heisshunger</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Was kann ich jetzt essen?</div></div>
+      </button>
+      <button class="coach-link-btn" onclick="openCoach('Ich bin heute sehr müde und habe keine Energie. Ich bin Tobias, arbeite im Büro, möchte abnehmen. Was hilft jetzt?')">
+        <span style="font-size:24px">😴</span>
+        <div><div style="font-weight:800;font-size:15px">Müde &amp; keine Energie</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Was hilft jetzt sofort?</div></div>
+      </button>
+      <button class="coach-link-btn" onclick="openCoach('Ich hatte heute einen Rückfall und habe zu viel gegessen. Ich bin Tobias, versuche abzunehmen. Wie gehe ich jetzt damit um?')">
+        <span style="font-size:24px">😔</span>
+        <div><div style="font-weight:800;font-size:15px">Rückfall</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Zu viel gegessen – was nun?</div></div>
+      </button>
+      <button class="coach-link-btn" onclick="openCoach('Ich brauche Motivation zum Abnehmen. Ich bin Tobias, wiege 115kg, Ziel ist 87kg. Meine Frau ist schwanger und ich möchte fit sein wenn das Baby kommt. Motiviere mich!')">
+        <span style="font-size:24px">💪</span>
+        <div><div style="font-weight:800;font-size:15px">Motivation</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Ich brauche einen Schubs</div></div>
+      </button>
+      <button class="coach-link-btn" onclick="openCoach('Was sind gute Snack-Ideen zum Abnehmen? Ich koche selbst, esse gerne viel, und versuche Fett zu reduzieren. Ich bin Tobias.')">
+        <span style="font-size:24px">🍽️</span>
+        <div><div style="font-weight:800;font-size:15px">Snack-Idee</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Was kann ich zwischendurch essen?</div></div>
+      </button>
+    </div>
+
+    <div class="card tip-card" style="margin-top:12px">
+      <div class="card-label" style="color:#c07840">&#x1F4A1; So funktioniert es</div>
+      <div class="tip-text">Tippe auf ein Thema → Claude öffnet sich → beantworte kurz und schick ab. Antwort kommt in Sekunden.</div>
     </div>
   </div>
 
@@ -443,67 +461,9 @@ function showView(name,btn){
 
 render();
 
-async function sendCoach(){
-  const inp=document.getElementById('coach-input');
-  const msg=inp.value.trim();
-  if(!msg)return;
-  inp.value='';
-  addMsg(msg,'user');
-  const btn=document.getElementById('coach-send');
-  btn.disabled=true;
-  // typing indicator
-  const typing=document.createElement('div');
-  typing.className='msg msg-coach';
-  typing.id='typing';
-  typing.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
-  document.getElementById('coach-messages').appendChild(typing);
-  scrollChat();
-  try {
-    const entries=loadE();
-    const latest=entries.length?entries[entries.length-1].weight:START_WEIGHT;
-    const lost=parseFloat((START_WEIGHT-latest).toFixed(1));
-    const context=`Du bist ein einfuehlsamer aber direkter Ernaehrungs- und Fitness-Coach. Der Nutzer heisst Tobias, wiegt aktuell ${latest}kg (Startgewicht 115kg, hat ${lost}kg abgenommen), Ziel ist 87kg. Seine Frau ist schwanger (SSW ${getPW()}). Er kocht selbst, hat das Problem dass er nicht aufhoeren kann zu essen wenn es lecker ist, und reduziert Fett/Rahm. Antworte auf Deutsch, kurz (max 4 Saetze), warmherzig aber direkt. Gib bei Heisshunger 2-3 konkrete Lebensmittel-Vorschlaege. Keine langen Listen, kein Fachjargon.`;
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:150,
-        system:context,
-        messages:[{role:'user',content:msg}]
-      })
-    });
-    const data=await res.json();
-    const reply=data.content&&data.content[0]?data.content[0].text:'Danke fuer deine Nachricht!';
-    document.getElementById('typing')?.remove();
-    addMsg(reply,'coach');
-  } catch(e) {
-    document.getElementById('typing')?.remove();
-    addMsg('Kurz nicht erreichbar – aber du schaffst das! 💪','coach');
-  }
-  btn.disabled=false;
-}
-
-function addMsg(text,type){
-  const div=document.createElement('div');
-  div.className='msg msg-'+type;
-  div.textContent=text;
-  document.getElementById('coach-messages').appendChild(div);
-  scrollChat();
-}
-
-function scrollChat(){
-  const el=document.getElementById('coach-messages');
-  el.scrollTop=el.scrollHeight;
-}
-
-function quickMsg(text){
-  document.getElementById('coach-input').value=text;
-  sendCoach();
-}
-
-function coachKeydown(e){
-  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendCoach();}
+function openCoach(prompt){
+  const url='https://claude.ai/new?q='+encodeURIComponent(prompt);
+  window.open(url,'_blank');
 }
 
 </script>

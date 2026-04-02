@@ -212,9 +212,22 @@
 
 <div class="header">
   <div class="header-icon">🔥</div>
-  <div>
+  <div onclick="headerTap()" style="cursor:default;user-select:none;">
     <div class="header-sub">Mein Projekt</div>
     <div class="header-title">Gewicht Tracker</div>
+  </div>
+</div>
+
+<div id="baby-secret" style="display:none;background:#e8f4ff;border-bottom:1px solid #c5dff0;padding:14px 20px;">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div style="background:white;border-radius:12px;padding:10px;font-size:40px;line-height:1;box-shadow:0 2px 8px rgba(0,0,0,0.08)" id="s-emoji">🌱</div>
+    <div>
+      <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#7aadcc;font-weight:700;margin-bottom:3px">Schwangerschaftswoche</div>
+      <div style="font-size:30px;font-weight:800;color:#5ba8d4;line-height:1" id="s-ssw">–</div>
+      <div style="font-size:14px;font-weight:700;color:#5a8aaa;margin-top:4px" id="s-size">–</div>
+      <div style="font-size:12px;color:#88afc8;margin-top:2px" id="s-info">–</div>
+    </div>
+    <div onclick="document.getElementById('baby-secret').style.display='none'" style="margin-left:auto;font-size:20px;cursor:pointer;color:#aac8dc;padding:4px;">✕</div>
   </div>
 </div>
 
@@ -509,6 +522,46 @@ function showView(name,btn){
 }
 
 render();
+
+// 3x Tippen auf Titel = Baby-Panel
+let _tapCount=0, _tapTimer=null;
+function headerTap(){
+  _tapCount++;
+  clearTimeout(_tapTimer);
+  _tapTimer=setTimeout(()=>{ _tapCount=0; },600);
+  if(_tapCount>=3){
+    _tapCount=0;
+    const panel=document.getElementById('baby-secret');
+    panel.style.display=panel.style.display==='none'?'block':'none';
+    renderBaby();
+  }
+}
+
+const BABY=[
+  {w:1,s:'Mohnkorn',e:'🌱',i:'Befruchtung'},
+  {w:4,s:'Reiskorn',e:'🌾',i:'Einnistung abgeschlossen'},
+  {w:6,s:'Linse',e:'🫘',i:'Herzschlag beginnt'},
+  {w:8,s:'Himbeere',e:'🫐',i:'Alle Organe angelegt'},
+  {w:10,s:'Erdbeere',e:'🍓',i:'Finger & Zehen sichtbar'},
+  {w:12,s:'Pflaume',e:'🍑',i:'1. Trimester abgeschlossen'},
+  {w:16,s:'Avocado',e:'🥑',i:'Bewegungen spürbar'},
+  {w:20,s:'Banane',e:'🍌',i:'Halbzeit!'},
+  {w:24,s:'Maiskolben',e:'🌽',i:'Lebensfähig ausserhalb'},
+  {w:28,s:'Aubergine',e:'🍆',i:'3. Trimester beginnt'},
+  {w:32,s:'Ananas',e:'🍍',i:'Augen öffnen sich'},
+  {w:36,s:'Melone',e:'🍈',i:'Fast bereit!'},
+  {w:40,s:'Kürbis',e:'🎃',i:'Geburtstermin 🎉'},
+];
+const PREGNANCY_WEEK_START=4;
+function getPW(){return PREGNANCY_WEEK_START+getWeeks();}
+function getBaby(pw){let c=BABY[0];for(const m of BABY){if(pw>=m.w)c=m;}return c;}
+function renderBaby(){
+  const pw=getPW(), baby=getBaby(pw);
+  document.getElementById('s-ssw').textContent=pw;
+  document.getElementById('s-emoji').textContent=baby.e;
+  document.getElementById('s-size').textContent=baby.s;
+  document.getElementById('s-info').textContent=baby.i;
+}
 </script>
 </body>
 </html>

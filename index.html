@@ -197,6 +197,15 @@
   .rule-desc  { font-size: 12px; color: var(--muted); line-height: 1.5; }
   .tip-card { background: linear-gradient(135deg, #fff8f5, #fff4f7); border-color: #ffd8cc; }
   .tip-text { font-size: 14px; color: #b05850; line-height: 1.7; font-weight: 500; }
+
+  .edit-btn { background: var(--violet-light); border: none; border-radius: 8px; padding: 5px 10px; font-size: 11px; font-weight: 700; color: var(--violet); cursor: pointer; font-family: var(--font); flex-shrink: 0; transition: all 0.15s; }
+  .edit-btn:active { background: var(--violet); color: white; }
+  .del-btn { background: var(--coral-light); border: none; border-radius: 8px; padding: 5px 10px; font-size: 11px; font-weight: 700; color: var(--coral); cursor: pointer; font-family: var(--font); flex-shrink: 0; }
+  .edit-row { display: flex; gap: 8px; align-items: center; padding: 10px 0 4px; border-top: 1px solid var(--border); margin-top: 6px; }
+  .edit-input { flex: 1; background: var(--surface2); border: 2px solid var(--violet-mid); border-radius: 10px; padding: 8px 12px; font-size: 22px; font-family: var(--font); font-weight: 800; color: var(--text); outline: none; letter-spacing: -0.5px; min-width: 0; }
+  .edit-input:focus { border-color: var(--violet); background: white; }
+  .edit-save { background: var(--violet); color: white; border: none; border-radius: 10px; padding: 9px 14px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); flex-shrink: 0; }
+  .edit-cancel { background: var(--border); color: var(--muted); border: none; border-radius: 10px; padding: 9px 12px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -217,7 +226,7 @@
       <div>
         <div class="hero-label">Aktuelles Gewicht</div>
         <div class="hero-weight-row">
-          <span class="hero-weight" id="hero-weight">115</span>
+          <span class="hero-weight" id="hero-weight">113.9</span>
           <span class="hero-unit">kg</span>
         </div>
       </div>
@@ -236,8 +245,8 @@
         <div class="progress-fill" id="progress-fill" style="width:0%"></div>
       </div>
       <div class="progress-ends">
-        <span>Start: 115 kg</span>
-        <span id="progress-remaining">Noch 28.0 kg</span>
+        <span>Start: 113.9 kg</span>
+        <span id="progress-remaining">Noch 26.9 kg</span>
       </div>
     </div>
   </div>
@@ -333,7 +342,7 @@
 </div>
 
 <script>
-const START_WEIGHT=115,TARGET_WEIGHT=87,TOTAL_WEEKS=39;
+const START_WEIGHT=113.9,TARGET_WEIGHT=87,TOTAL_WEEKS=39;
 const START_DATE=new Date('2026-03-24');
 const MSGS=['Tippe eine Regel an','Gut! Weiter so 💪','Fast geschafft!','Perfekter Tag! 🌟'];
 
@@ -406,19 +415,60 @@ function renderChart(entries,currentWeek){
   svg.innerHTML=h;
 }
 
-function renderHistory(entries){
+function renderHistory(entries, editIdx=null){
   const el=document.getElementById('history-list');
   if(!entries.length){el.innerHTML='<div class="empty-state">Noch keine Einträge 📋</div>';return;}
   const rev=[...entries].reverse();
   el.innerHTML=rev.map((e,i)=>{
+    const realIdx=entries.length-1-i;
     const prev=rev[i+1];
     const diff=prev?(e.weight-prev.weight):(e.weight-START_WEIGHT);
     const ds=diff<0?diff.toFixed(1):(diff>0?'+'+diff.toFixed(1):'0.0');
     const dc=diff<0?'var(--mint)':diff>0?'var(--coral)':'var(--muted)';
     const d=new Date(e.date);
     const dateStr=d.toLocaleDateString('de-CH',{day:'2-digit',month:'short'});
-    return `<div class="history-row"><div><div class="history-date">${dateStr}</div><div class="history-week">Woche ${e.week}</div></div><div><div class="history-weight">${e.weight} kg</div><div class="history-diff" style="color:${dc}">${ds} kg</div></div></div>`;
+    const isEditing=(editIdx===realIdx);
+    return `<div class="history-row" style="flex-wrap:wrap">
+      <div><div class="history-date">${dateStr}</div><div class="history-week">Woche ${e.week}</div></div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div>
+          <div class="history-weight">${e.weight} kg</div>
+          <div class="history-diff" style="color:${dc}">${ds} kg</div>
+        </div>
+        <button class="edit-btn" onclick="startEdit(${realIdx})">✏️</button>
+        <button class="del-btn" onclick="deleteEntry(${realIdx})">✕</button>
+      </div>
+      ${isEditing?`<div class="edit-row" style="width:100%">
+        <input class="edit-input" id="edit-input" type="number" step="0.1" min="50" max="200" value="${e.weight}" placeholder="${e.weight}">
+        <button class="edit-save" onclick="saveEdit(${realIdx})">✓</button>
+        <button class="edit-cancel" onclick="renderHistory(loadE())">✕</button>
+      </div>`:''}
+    </div>`;
   }).join('');
+  if(editIdx!==null){
+    const inp=document.getElementById('edit-input');
+    if(inp){inp.focus();inp.select();}
+  }
+}
+
+function startEdit(idx){
+  renderHistory(loadE(), idx);
+}
+
+function saveEdit(idx){
+  const val=parseFloat(document.getElementById('edit-input').value);
+  if(!val||val<50||val>200)return;
+  const entries=loadE();
+  entries[idx].weight=val;
+  saveE(entries);
+  render();
+}
+
+function deleteEntry(idx){
+  const entries=loadE();
+  entries.splice(idx,1);
+  saveE(entries);
+  render();
 }
 
 function renderRules(){
